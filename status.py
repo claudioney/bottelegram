@@ -99,7 +99,7 @@ def handle(msg):
 
 	print 'Texto digitado: %s' % command
 
-	if chat_id != cfg.chatCfg['idChat']:
+	if str(chat_id) != str(cfg.chatCfg['idChat']):
 		bot.sendMessage(chat_id,'ops, vc nao pode acessar esse chatbot! sorry!')
 	elif command.startswith("Quero 69"):
         	ipSet = msg['text'][8:]
@@ -144,6 +144,8 @@ MessageLoop(bot, handle).run_as_thread()
 print 'Estou ouvindo ...'
 horas = '99'
 ipSet = '51'
+
+enviaFoto(cfg.chatCfg['idChat'])
 
 while 1:
     time.sleep(10)
