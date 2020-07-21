@@ -59,7 +59,13 @@ def gravaConfigCamera():
     le = csv.writer(open('ipcam.csv', 'w'))
     le.writerow(["varanda",ipcam1])
     le.writerow(["sala",ipcam2])
-    return;
+    return
+
+def espacoDisco(chat_id):
+    s = os.statvfs("/")
+    diskSpacePercent =  round((((s.f_blocks - s.f_bfree) * s.f_frsize)/(s.f_blocks * s.f_bsize)) * 100, 2)
+    bot.sendMessage(chat_id,'Espaço em disco:'+str(diskSpacePercent))
+    return
 
 def listaIps(chat_id):
     bot.sendMessage(chat_id,'Deixa eu ver...')
@@ -220,10 +226,6 @@ def handle(msg):
 
     if str(chat_id) != str(cfg.chatCfg['idChat']):
         bot.sendMessage(chat_id,'ops, vc nao pode acessar esse chatbot! sorry!')
-    elif command.startswith("Quero 69"):
-        ipSet = msg['text'][8:]
-        print ('ip mudado para '+ipSet)
-        bot.sendMessage(chat_id,'Agora estou de '+ipSet)
     elif command == '/start':
         bot.sendMessage(chat_id,'Bem vindo!')
         sp.check_call('mkdir '+str(chat_id), shell=True)
@@ -235,13 +237,13 @@ def handle(msg):
         enviaVideo(chat_id)
     elif command == 'Paradinha':
          enviaTimelapse(chat_id)
-    elif command.startswith("Cam1"):
-         ipcam1 = msg['text'][4:]
+    elif command.startswith("Cam1="):
+         ipcam1 = msg['text'][5:]
          gravaConfigCamera()
          print ('ipcam1 mudado para '+ipcam1)
          bot.sendMessage(chat_id,'IPcam1='+ipcam1)
-    elif command.startswith("Cam2"):
-         ipcam2 = msg['text'][4:]
+    elif command.startswith("Cam2="):
+         ipcam2 = msg['text'][5:]
          gravaConfigCamera()
          print ('ipcam2 mudado para '+ipcam2)
          bot.sendMessage(chat_id,'IPcam2='+ipcam2)
@@ -261,6 +263,8 @@ def handle(msg):
     elif command == 'Toca o terror':
         bot.sendMessage(chat_id,'Tocando o alarme por 60 segundos')
         tocaAlarme()
+    elif command == 'Disco':
+         espacoDisco(chat_id)
     elif command == 'WON':
         bot.sendMessage(chat_id,'WARNING ON')
         WARNING = 1
