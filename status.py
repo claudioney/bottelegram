@@ -182,7 +182,7 @@ def sensorPresenca(GPIO_MOTION):
     if ALARM ==1:
         alarmeRelay()
 
-    time.sleep(5)
+    time.sleep(1)
 
 def sensorPorta(GPIO_DOOR):
     if GPIO.input(GPIO_DOOR) == 1:
@@ -277,7 +277,9 @@ def handle(msg):
 bot = telepot.Bot(cfg.botTelepot['id'])
 
 MessageLoop(bot, handle).run_as_thread()
+
 print ('Estou ouvindo ...')
+bot.sendMessage(cfg.chatCfg['idChat'],'SISTEMA REINICIADO.')
 achou_time = 0
 minuto = 30
 horas  = 99
@@ -294,38 +296,33 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 #sensor de porta
 GPIO.setup(GPIO_DOOR, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-#GPIO.setup(GPIO_DOOR, GPIO.IN)
 #sensor de presenca
 GPIO.setup(GPIO_MOTION, GPIO.IN)
 
-#try:
-#GPIO.remove_event_detect(GPIO_DOOR)
-GPIO.add_event_detect(GPIO_DOOR, GPIO.BOTH, callback = sensorPorta)
-#GPIO.add_event_detect(GPIO_DOOR, GPIO.RISING,  callback = sensorPortaFechada)
-#GPIO.add_event_detect(GPIO_DOOR, GPIO.FALLING, callback = sensorPortaAberta)
-#GPIO.add_event_detect(GPIO_DOOR, GPIO.PUD_DOWN, callback = sensorPortaFechada)
-GPIO.add_event_detect(GPIO_MOTION, GPIO.RISING, callback= sensorPresenca, bouncetime=200)
+try:
+    GPIO.add_event_detect(GPIO_DOOR, GPIO.BOTH, callback = sensorPorta)
+    GPIO.add_event_detect(GPIO_MOTION, GPIO.RISING, callback= sensorPresenca, bouncetime=200)
 
 #    start_server = websockets.serve(hello, "localhost", 8119)
 
 #    asyncio.get_event_loop().run_until_complete(start_server)
 #    asyncio.get_event_loop().run_forever()
 
-while True:
-     time.sleep(60)
+    while True:
+         time.sleep(60)
 
-     now = datetime.datetime.now()
-     if horas != now.hour:
-          horas  = now.hour
-          achou_time = 0
-          enviaFotoDirect(cfg.chatCfg['idChat'])
+         now = datetime.datetime.now()
+         if horas != now.hour:
+              horas  = now.hour
+              achou_time = 0
+              enviaFotoDirect(cfg.chatCfg['idChat'])
 #          enviaVideoDirect(cfg.chatCfg['idChat'])
-     if (now.minute > minuto) and achou_time == 0:
+         if (now.minute > minuto) and achou_time == 0:
 #          print("enviado timelapse")
-          achou_time = 1
-          h = now - timedelta(hours=1)
-          enviaTimelapseHour(h.hour,cfg.chatCfg['idChat'])
+              achou_time = 1
+              h = now - timedelta(hours=1)
+              enviaTimelapseHour(h.hour,cfg.chatCfg['idChat'])
 
-#except:
-#    print("Unexpected error:", sys.exc_info()[0])
-#    GPIO.cleanup()
+except:
+    print("Unexpected error:", sys.exc_info()[0])
+    GPIO.cleanup()
