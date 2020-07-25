@@ -25,6 +25,8 @@ ipcam2 = 1
 portaFechada = 1
 WARNING = 1
 ALARM = 0
+WARN_GPIO = 1
+WARN_GPIO2 = 1
 
 async def hello(websocket, path):
     name = await websocket.recv()
@@ -38,7 +40,7 @@ async def hello(websocket, path):
 def checkStatus():
     global GPIO_DOOR
     bot.sendMessage(cfg.chatCfg['idChat'],'VERIFICACAO DE STATUS DA PORTA')
-    sensorPorta(GPIO_DOOR)
+    verPorta(GPIO_DOOR)
     return
 
 def alarmeRelay():
@@ -181,7 +183,13 @@ def menu(chat_id):
     return
 
 def sensorPresenca(GPIO_MOTION):
-    global WARNING, ALARM
+    global WARNING, ALARM, WARN_GPIO, WARN_GPIO2
+
+    if GPIO_MOTION == 23 and WARN_GPIO == 0:
+        return
+    if GPIO_MOTION == 24 and WARN_GPIO2 == 0:
+        return
+
     if WARNING == 1:
         print("Motion Detected! ->"+str(GPIO_MOTION))
         bot.sendMessage(cfg.chatCfg['idChat'],'SENSOR DE PRESENÇA ON: '+str(GPIO_MOTION))
@@ -196,6 +204,15 @@ def sensorPorta(GPIO_DOOR):
         sensorPortaAberta()
     if GPIO.input(GPIO_DOOR) == 0:
         sensorPortaFechada()
+    return
+
+def verPorta(GPIO_DOOR):
+    if GPIO.input(GPIO_DOOR) ==1:
+        bot.sendMessage(cfg.chatCfg['idChat'],'STATUS DE PORTA FECHADA')
+    if GPIO.input(GPIO_DOOR) ==0:
+        bot.sendMessage(cfg.chatCfg['idChat'],'STATUS DE PORTA ABERTA')
+
+    return
 
 def sensorPortaAberta():
     global WARNING, ALARM,portaFechada
@@ -225,7 +242,7 @@ def sensorPortaFechada():
     time.sleep(0.5)
 
 def handle(msg):
-    global ipSet, ipcam1, ipcam2, WARNING
+    global ipSet, ipcam1, ipcam2, WARNING, WARN_GPIO, WARN_GPIO2
     chat_id = msg['chat']['id']
     command = msg['text']
 
@@ -278,6 +295,18 @@ def handle(msg):
     elif command == 'WOFF':
         bot.sendMessage(chat_id,'WARNING OFF')
         WARNING = 0
+    elif command == 'GPION':
+        WARN_GPIO = 1
+        bot.sendMessage(chat_id, 'GPIO ON')
+    elif command == 'GPIOFF':
+        WARN_GPIO = 0
+        bot.sendMessage(chat_id, 'GPIO OFF')
+    elif command == 'GPION2':
+        WARN_GPIO2 = 1
+        bot.sendMessage(chat_id, 'GPIO 2 ON')
+    elif command == 'GPIOFF':
+        WARN_GPIO2 = 0
+        bot.sendMessage(chat_id, 'GPIO 2 OFF')
 
 
 
