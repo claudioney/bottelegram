@@ -16,7 +16,8 @@ import csv
 
 
 GPIO_DOOR = 22
-GPIO_MOTION = 27
+GPIO_MOTION = 24
+GPIO_MOTION2 = 23
 sirene = 25
 ipcam1 = 1
 ipcam2 = 1
@@ -33,6 +34,12 @@ async def hello(websocket, path):
 
     await websocket.send(greeting)
     print(f"> {greeting}")
+
+def checkStatus():
+    global GPIO_DOOR
+    bot.sendMessage(cfg.chatCfg['idChat'],'VERIFICACAO DE STATUS DA PORTA')
+    sensorPorta(GPIO_DOOR)
+    return
 
 def alarmeRelay():
     return
@@ -176,13 +183,13 @@ def menu(chat_id):
 def sensorPresenca(GPIO_MOTION):
     global WARNING, ALARM
     if WARNING == 1:
-        print("Motion Detected!")
-        bot.sendMessage(cfg.chatCfg['idChat'],'SENSOR DE PRESENÇA ON')
+        print("Motion Detected! ->"+str(GPIO_MOTION))
+        bot.sendMessage(cfg.chatCfg['idChat'],'SENSOR DE PRESENÇA ON: '+str(GPIO_MOTION))
 
     if ALARM ==1:
         alarmeRelay()
+    time.sleep(0.5)
 
-    time.sleep(1)
 
 def sensorPorta(GPIO_DOOR):
     if GPIO.input(GPIO_DOOR) == 1:
@@ -298,10 +305,16 @@ GPIO.setwarnings(False)
 GPIO.setup(GPIO_DOOR, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 #sensor de presenca
 GPIO.setup(GPIO_MOTION, GPIO.IN)
+GPIO.setup(GPIO_MOTION2, GPIO.IN)
+
+#vericar status  do GPIO
+checkStatus()
 
 try:
     GPIO.add_event_detect(GPIO_DOOR, GPIO.BOTH, callback = sensorPorta)
-    GPIO.add_event_detect(GPIO_MOTION, GPIO.RISING, callback= sensorPresenca, bouncetime=200)
+    GPIO.add_event_detect(GPIO_MOTION,  GPIO.RISING, callback= sensorPresenca, bouncetime=200)
+    GPIO.add_event_detect(GPIO_MOTION2, GPIO.RISING, callback= sensorPresenca, bouncetime=200)
+
 
 #    start_server = websockets.serve(hello, "localhost", 8119)
 
