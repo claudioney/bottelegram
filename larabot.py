@@ -38,7 +38,6 @@ async def hello(websocket, path):
     print(f"> {greeting}")
 
 def checkStatus():
-    global GPIO_DOOR
     bot.sendMessage(cfg.chatCfg['idChat'],'VERIFICACAO DE STATUS DA PORTA')
     verPorta()
     return
@@ -310,6 +309,7 @@ def handle(msg):
         bot.sendMessage(chat_id, 'GPIO 2 OFF')
     elif command == 'PORTA':
         verPorta()
+
 
 
 
