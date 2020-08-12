@@ -38,6 +38,7 @@ async def hello(websocket, path):
     print(f"> {greeting}")
 
 def checkStatus():
+    global GPIO_DOOR
     bot.sendMessage(cfg.chatCfg['idChat'],'VERIFICACAO DE STATUS DA PORTA')
     verPorta()
     return
@@ -207,10 +208,11 @@ def sensorPorta(GPIO_DOOR):
 
 def verPorta():
     global GPIO_DOOR
-    if GPIO.input(GPIO_DOOR) ==1:
-        bot.sendMessage(cfg.chatCfg['idChat'],'STATUS DE PORTA FECHADA')
-    if GPIO.input(GPIO_DOOR) ==0:
+    # como o pud_up esta como up, se tiver fio separado, é 1
+    if GPIO.input(GPIO_DOOR) == 1:
         bot.sendMessage(cfg.chatCfg['idChat'],'STATUS DE PORTA ABERTA')
+    if GPIO.input(GPIO_DOOR) ==0:
+        bot.sendMessage(cfg.chatCfg['idChat'],'STATUS DE PORTA FECHADA')
 
     return
 
@@ -309,7 +311,6 @@ def handle(msg):
         bot.sendMessage(chat_id, 'GPIO 2 OFF')
     elif command == 'PORTA':
         verPorta()
-
 
 
 
