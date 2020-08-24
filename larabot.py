@@ -5,7 +5,7 @@ import random
 import datetime
 import telepot
 import asyncio
-import websockets
+#import websockets
 import subprocess as sp
 from telepot.loop import MessageLoop
 from datetime import timedelta 
