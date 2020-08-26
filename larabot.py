@@ -107,11 +107,15 @@ def enviaTimelapseHour(hora, chat_id):
     localfile = '/home/pi/camimage/timelapse_'+str(hora)+'.mp4'
     if hora <10:
       localfile = '/home/pi/camimage/timelapse_0'+str(hora)+'.mp4'
-    print("enviado timelapse"+ localfile)
-    bot.sendVideo(chat_id, open(localfile, 'rb'))
+    if os.path.exists(localfile):
+      print("enviado timelapse: "+ localfile)
+      try:
+        bot.sendVideo(chat_id, open(localfile, 'rb'))
+      except:
+        bot.sendMessage(chat_id,'falha ao mandar a foto direta')
     time.sleep(0.5)
 
-def enviaFotoDirect(chat_id):
+def xenviaFotoDirect(chat_id):
     global ipcam1, ipcam2, ipSet
     ipSet = ipcam1
     directFoto(chat_id)
@@ -283,7 +287,7 @@ def handle(msg):
                                     [KeyboardButton(text="Manda nude")],
                                     [KeyboardButton(text="Corta pra 18")],
                                     [KeyboardButton(text='Ta sozinha?')],
-                                    [KeyboardButton(text='Paradinha')]
+                                    ['WON', 'WOFF', 'Disco', 'PORTA']
                                 ]
                             ))
     elif command == 'Toca o terror':
