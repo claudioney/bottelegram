@@ -104,6 +104,7 @@ def enviaTimelapse(chat_id):
     return;
 
 def enviaTimelapseHour(hora, chat_id):
+    print ('Validando timelapse')
     localfile = '/home/pi/camimage/timelapse_'+str(hora)+'.mp4'
     if hora <10:
       localfile = '/home/pi/camimage/timelapse_0'+str(hora)+'.mp4'
@@ -113,6 +114,7 @@ def enviaTimelapseHour(hora, chat_id):
         bot.sendVideo(chat_id, open(localfile, 'rb'))
       except:
         bot.sendMessage(chat_id,'falha ao mandar a foto direta')
+
     time.sleep(0.5)
 
 def xenviaFotoDirect(chat_id):
@@ -322,7 +324,7 @@ bot = telepot.Bot(cfg.botTelepot['id'])
 
 MessageLoop(bot, handle).run_as_thread()
 
-print ('Estou ouvindo ...')
+print ('Iniciando o sistema')
 bot.sendMessage(cfg.chatCfg['idChat'],'SISTEMA REINICIADO.')
 achou_time = 0
 minuto = 30
@@ -331,6 +333,7 @@ ipSet  = '0'
 portaFechada = 1;
 
 leConfigCamera()
+print ('Lendo as configuraçoes da camera')
 
 #enviaFotoDirect(cfg.chatCfg['idChat'])
 
@@ -344,10 +347,12 @@ GPIO.setup(GPIO_DOOR, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 #GPIO.setup(GPIO_MOTION, GPIO.IN)
 #GPIO.setup(GPIO_MOTION2, GPIO.IN)
 
+print ('Validando o checkstatus')
 #vericar status  do GPIO
 checkStatus()
 
 try:
+    print ('Iniciando GPIO')
     GPIO.add_event_detect(GPIO_DOOR, GPIO.BOTH, callback = sensorPorta)
 #    GPIO.add_event_detect(GPIO_MOTION,  GPIO.RISING, callback= sensorPresenca, bouncetime=200)
 #    GPIO.add_event_detect(GPIO_MOTION2, GPIO.RISING, callback= sensorPresenca, bouncetime=200)
@@ -357,18 +362,19 @@ try:
 
 #    asyncio.get_event_loop().run_until_complete(start_server)
 #    asyncio.get_event_loop().run_forever()
-
+    print ('iniciando o loop')
     while True:
-         time.sleep(60)
+         time.sleep(1)
 
          now = datetime.datetime.now()
          if horas != now.hour:
+              print('Hora fechada')
               horas  = now.hour
               achou_time = 0
               enviaFotoDirect(cfg.chatCfg['idChat'])
 #          enviaVideoDirect(cfg.chatCfg['idChat'])
          if (now.minute > minuto) and achou_time == 0:
-#          print("enviado timelapse")
+              print("enviado timelapse")
               achou_time = 1
               h = now - timedelta(hours=1)
               enviaTimelapseHour(h.hour,cfg.chatCfg['idChat'])
