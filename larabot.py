@@ -113,11 +113,11 @@ def enviaTimelapseHour(hora, chat_id):
       try:
         bot.sendVideo(chat_id, open(localfile, 'rb'))
       except:
-        bot.sendMessage(chat_id,'falha ao mandar a foto direta')
+        bot.sendMessage(chat_id,'falha ao mandar timelapse')
 
     time.sleep(0.5)
 
-def xenviaFotoDirect(chat_id):
+def enviaFotoDirect(chat_id):
     global ipcam1, ipcam2, ipSet
     ipSet = ipcam1
     directFoto(chat_id)
