@@ -364,8 +364,6 @@ try:
 #    asyncio.get_event_loop().run_forever()
     print ('iniciando o loop')
     while True:
-         time.sleep(1)
-
          now = datetime.datetime.now()
          if horas != now.hour:
               print('Hora fechada')
@@ -378,6 +376,7 @@ try:
               achou_time = 1
               h = now - timedelta(hours=1)
               enviaTimelapseHour(h.hour,cfg.chatCfg['idChat'])
+         time.sleep(60)
 
 except:
     print("Unexpected error:", sys.exc_info()[0])
