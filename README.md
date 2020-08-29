@@ -11,6 +11,7 @@ depois instalar os modulos:
 $ pip3 install telepot
 $ pip3 install gpio
 
-Precisam instalar apps no sistema operacional
+Precisam instalar apps no sistema operacional:
+
 $ sudo apt-get -y install ffmpeg && nmap
 
