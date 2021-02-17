@@ -342,7 +342,7 @@ GPIO.setmode(GPIO.BCM)
 #selecionando sirene out
 GPIO.setwarnings(False)
 #sensor de porta
-GPIO.setup(GPIO_DOOR, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#GPIO.setup(GPIO_DOOR, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 #sensor de presenca
 #GPIO.setup(GPIO_MOTION, GPIO.IN)
 #GPIO.setup(GPIO_MOTION2, GPIO.IN)
@@ -353,7 +353,7 @@ checkStatus()
 
 try:
     print ('Iniciando GPIO')
-    GPIO.add_event_detect(GPIO_DOOR, GPIO.BOTH, callback = sensorPorta)
+#    GPIO.add_event_detect(GPIO_DOOR, GPIO.BOTH, callback = sensorPorta)
 #    GPIO.add_event_detect(GPIO_MOTION,  GPIO.RISING, callback= sensorPresenca, bouncetime=200)
 #    GPIO.add_event_detect(GPIO_MOTION2, GPIO.RISING, callback= sensorPresenca, bouncetime=200)
 
