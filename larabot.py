@@ -349,7 +349,7 @@ GPIO.setwarnings(False)
 
 print ('Validando o checkstatus')
 #vericar status  do GPIO
-checkStatus()
+#checkStatus()
 
 try:
     print ('Iniciando GPIO')
