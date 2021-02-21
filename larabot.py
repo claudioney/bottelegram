@@ -11,6 +11,7 @@ from telepot.loop import MessageLoop
 from datetime import timedelta 
 import RPi.GPIO as GPIO
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
+from io import gpio_number
 import config as cfg
 import csv
 
