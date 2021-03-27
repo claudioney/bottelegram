@@ -104,6 +104,12 @@ def enviaTimelapse(chat_id):
     time.sleep(0.5)
     return;
 
+def enviaArquivo(chat_id, arquivo):
+    bot.sendMessage(chat_id,'enviando arquivo...')
+    bot.sendVideo(chat_id, open('/home/pi/camimage/'+arquivo, 'rb'))
+    time.sleep(0.5)
+    return;
+
 def enviaTimelapseHour(hora, chat_id):
     print ('Validando timelapse')
     localfile = '/home/pi/camimage/timelapse_'+str(hora)+'.mp4'
@@ -268,22 +274,25 @@ def handle(msg):
         enviaFoto(chat_id)
     elif command == 'Corta pra 18':
         enviaVideo(chat_id)
+    elif command.startswith("Toma="):
+        arq = msg['text'][5:]
+        enviaArquivo(chat_id, arq)
     elif command == 'Paradinha':
-         enviaTimelapse(chat_id)
+        enviaTimelapse(chat_id)
     elif command.startswith("Cam1="):
-         ipcam1 = msg['text'][5:]
-         gravaConfigCamera()
-         print ('ipcam1 mudado para '+ipcam1)
-         bot.sendMessage(chat_id,'IPcam1='+ipcam1)
+        ipcam1 = msg['text'][5:]
+        gravaConfigCamera()
+        print ('ipcam1 mudado para '+ipcam1)
+        bot.sendMessage(chat_id,'IPcam1='+ipcam1)
     elif command.startswith("Cam2="):
-         ipcam2 = msg['text'][5:]
-         gravaConfigCamera()
-         print ('ipcam2 mudado para '+ipcam2)
-         bot.sendMessage(chat_id,'IPcam2='+ipcam2)
+        ipcam2 = msg['text'][5:]
+        gravaConfigCamera()
+        print ('ipcam2 mudado para '+ipcam2)
+        bot.sendMessage(chat_id,'IPcam2='+ipcam2)
     elif command.startswith("IP "):
-         ipSet = msg['text'][3:]
-         print ('ip mudado para '+ipSet)
-         bot.sendMessage(chat_id,'IP='+ipSet)
+        ipSet = msg['text'][3:]
+        print ('ip mudado para '+ipSet)
+        bot.sendMessage(chat_id,'IP='+ipSet)
     elif command == '/menu':
         bot.sendMessage(chat_id,'Selecione',reply_markup=ReplyKeyboardMarkup(
                                 keyboard=[
@@ -297,7 +306,7 @@ def handle(msg):
         bot.sendMessage(chat_id,'Tocando o alarme por 60 segundos')
         tocaAlarme()
     elif command == 'Disco':
-         espacoDisco(chat_id)
+        espacoDisco(chat_id)
     elif command == 'WON':
         bot.sendMessage(chat_id,'WARNING ON')
         WARNING = 1
