@@ -150,6 +150,11 @@ def directFoto(chat_id):
     time.sleep(0.5)
     return;
 
+def systemReboot(chat_id):
+    bot.sendMessage(chat_id,'sinto q vou desmaiar...')
+    os.system('systemctl reboot -i');
+    return;
+
 def directVideo(chat_id):
     imagem = os.getcwd()+'/'+str(chat_id)+'/directVideo.mkv';
     if os.path.exists(imagem):
@@ -307,6 +312,8 @@ def handle(msg):
         tocaAlarme()
     elif command == 'Disco':
         espacoDisco(chat_id)
+    elif command == 'Reboot':
+        systemReboot(chat_id)
     elif command == 'WON':
         bot.sendMessage(chat_id,'WARNING ON')
         WARNING = 1
