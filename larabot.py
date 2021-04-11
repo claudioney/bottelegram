@@ -115,17 +115,18 @@ def enviaArquivo(chat_id, arquivo):
 
 
 def enviaVideoMin(chat_id, ipcam):
-    time.sleep(10)
-    imagem = os.getcwd()+'/'+str(chat_id)+'/videoMin'+ipcam+'.mkv'
-    print ('gerando arquivo '+imagem)
-    if os.path.exists(imagem):
+    while True:
+      time.sleep(10)
+      imagem = os.getcwd()+'/'+str(chat_id)+'/videoMin'+ipcam+'.mkv'
+      print ('gerando arquivo '+imagem)
+      if os.path.exists(imagem):
         os.remove(imagem)
-    try:
-       sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t 60 -codec copy ' + imagem, shell=True)
-       bot.sendVideo(chat_id, open(imagem, 'rb'))
-    except:
-      bot.sendMessage(chat_id,'falha ao mandar video min' + imagem)
-    time.sleep(5)
+      try:
+        sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t 300 -codec copy ' + imagem, shell=True)
+        bot.sendVideo(chat_id, open(imagem, 'rb'))
+      except:
+        bot.sendMessage(chat_id,'falha ao mandar video min' + imagem)
+        time.sleep(5)
     return
 
 
