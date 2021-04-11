@@ -1,7 +1,7 @@
 #!/bin/sh
 
 i="0"
-while [ $i -lt 6]
+while [ $i -lt 6 ]
 do
 rm /home/pi/camimage/$(date --date 'now - 6 hour' +%H)/directVideo*.mkv
 cd /home/pi/fontes/larabot
