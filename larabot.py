@@ -119,7 +119,7 @@ def enviaVideoMin(chat_id, ipcam):
     if os.path.exists(imagem):
         os.remove(imagem)
     try:
-       sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipSet+':1981//Master-0 -t 600 -codec copy ' + imagem, shell=True)
+       sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t 600 -codec copy ' + imagem, shell=True)
        bot.sendVideo(chat_id, open(imagem, 'rb'))
     except:
       bot.sendMessage(chat_id,'falha ao mandar video min' + imagem)
@@ -397,6 +397,8 @@ try:
 
 #    asyncio.get_event_loop().run_until_complete(start_server)
 #    asyncio.get_event_loop().run_forever()
+
+
     print ('iniciando o loop')
     while True:
          now = datetime.datetime.now()
