@@ -10,6 +10,7 @@ depois instalar os modulos:
 
 $ pip3 install telepot
 $ pip3 install gpio
+$ pip3 install ffmpeg-python
 
 Precisam instalar apps no sistema operacional:
 
