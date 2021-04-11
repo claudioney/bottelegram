@@ -12,6 +12,7 @@ from datetime import timedelta
 import RPi.GPIO as GPIO
 from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
 #from io import gpio_number
+from threading import Thread
 import config as cfg
 import csv
 
@@ -55,15 +56,15 @@ def tocaAlarme():
     time.sleep(60)
     print ("SIRENE off")
     GPIO.output(sirene,GPIO.LOW)
-    return;
+    return
 
 def leConfigCamera():
     global ipcam1, ipcam2
-    linhas = csv.reader(open('ipcam.csv'));
+    linhas = csv.reader(open('ipcam.csv'))
     for row in linhas: 
         if row[0] == 'varanda': ipcam1 = row[1]
         if row[0] == 'sala': ipcam2 =  row[1]
-    return;
+    return
 
 def gravaConfigCamera():
     le = csv.writer(open('ipcam.csv', 'w'))
@@ -87,14 +88,14 @@ def listaIps(chat_id):
 def listaIpsMenu(chat_id):
     list = sp.check_output('nmap -sP 192.168.2.1-255 | grep 192.168.2',shell=True)
     bot.sendMessage(chat_id,'Tem esse pessoal aqui',list.decode('utf-8').split('\n'))
-    return;
+    return
 
 def botaIp(chat_id,msg):
     global ipSet
     ipSet = msg['text'][8:]
     print ('ip no arquivo '+ipSet)
     sp.check_call('echo "'+ipSet+'\n" >> /home/pi/camimage/camp_ip.ini', shell=True)
-    return;
+    return
 
 def enviaTimelapse(chat_id):
     bot.sendMessage(chat_id,'estou indo fazer a paradinha...')
@@ -102,13 +103,28 @@ def enviaTimelapse(chat_id):
     bot.sendMessage(chat_id,'enviando..')
     bot.sendVideo(chat_id, open('/home/pi/camimage/timelapse.mp4', 'rb'))
     time.sleep(0.5)
-    return;
+    return
 
 def enviaArquivo(chat_id, arquivo):
     bot.sendMessage(chat_id,'enviando arquivo...')
     bot.sendVideo(chat_id, open('/home/pi/camimage/'+arquivo, 'rb'))
     time.sleep(0.5)
-    return;
+    return
+
+
+def enviaVideoMin(chat_id, ipcam):
+    imagem = os.getcwd()+'/'+str(chat_id)+'/videoMin'+ipcam+'.mkv'
+    print ('gerando arquivo '+imagem)
+    if os.path.exists(imagem):
+        os.remove(imagem)
+    try:
+       sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipSet+':1981//Master-0 -t 600 -codec copy ' + imagem, shell=True)
+       bot.sendVideo(chat_id, open(imagem, 'rb'))
+    except:
+      bot.sendMessage(chat_id,'falha ao mandar video min' + imagem)
+    time.sleep(5)
+    return
+
 
 def enviaTimelapseHour(hora, chat_id):
     print ('Validando timelapse')
@@ -148,15 +164,15 @@ def directFoto(chat_id):
     except:
       bot.sendMessage(chat_id,'falha ao mandar a foto direta')
     time.sleep(0.5)
-    return;
+    return
 
 def systemReboot(chat_id):
     bot.sendMessage(chat_id,'sinto q vou desmaiar...')
-    os.system('systemctl reboot -i');
-    return;
+    os.system('systemctl reboot -i')
+    return
 
 def directVideo(chat_id):
-    imagem = os.getcwd()+'/'+str(chat_id)+'/directVideo.mkv';
+    imagem = os.getcwd()+'/'+str(chat_id)+'/directVideo.mkv'
     if os.path.exists(imagem):
         os.remove(imagem)
     try:
@@ -165,10 +181,10 @@ def directVideo(chat_id):
     except:
       bot.sendMessage(chat_id,'falha ao mandar a video direta')
     time.sleep(0.5)
-    return;
+    return
 
 def enviaFoto(chat_id):
-    imagem = os.getcwd()+'/'+str(chat_id)+'/screenshot.jpg';
+    imagem = os.getcwd()+'/'+str(chat_id)+'/screenshot.jpg'
     if os.path.exists(imagem):
         os.remove(imagem)
     bot.sendMessage(chat_id,'estou indo tirar a foto')
@@ -183,7 +199,7 @@ def enviaFoto(chat_id):
 
 def enviaVideo(chat_id):
     global ipSet, ipcam1, ipcam2
-    imagem = os.getcwd()+'/'+str(chat_id)+'/capture.mkv';
+    imagem = os.getcwd()+'/'+str(chat_id)+'/capture.mkv'
     if os.path.exists(imagem):
         os.remove(imagem)
     bot.sendMessage(chat_id,'fazendo um video de 30 segundos')
@@ -347,11 +363,14 @@ achou_time = 0
 minuto = 30
 horas  = 99
 ipSet  = '0'
-portaFechada = 1;
+portaFechada = 1
 
 leConfigCamera()
 print ('Lendo as configuraçoes da camera')
 
+thread = Thread(target = enviaVideoMin, args = (cfg.chatCfg['idChat'], ipcam1,))
+thread.start()
+thread.join()
 #enviaFotoDirect(cfg.chatCfg['idChat'])
 
 #ativando gpio
