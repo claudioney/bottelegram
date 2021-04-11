@@ -60,6 +60,7 @@ def tocaAlarme():
 
 def leConfigCamera():
     global ipcam1, ipcam2
+    print ('Lendo as configuraçoes da ip camera')
     linhas = csv.reader(open('ipcam.csv'))
     for row in linhas: 
         if row[0] == 'varanda': ipcam1 = row[1]
@@ -358,36 +359,34 @@ bot = telepot.Bot(cfg.botTelepot['id'])
 MessageLoop(bot, handle).run_as_thread()
 
 print ('Iniciando o sistema')
-bot.sendMessage(cfg.chatCfg['idChat'],'SISTEMA REINICIADO.')
-achou_time = 0
-minuto = 30
-horas  = 99
-ipSet  = '0'
-portaFechada = 1
-
-leConfigCamera()
-print ('Lendo as configuraçoes da camera')
-
-thread = Thread(target = enviaVideoMin, args = (cfg.chatCfg['idChat'], ipcam1,))
-thread.start()
-thread.join()
-#enviaFotoDirect(cfg.chatCfg['idChat'])
-
-#ativando gpio
-GPIO.setmode(GPIO.BCM)
-#selecionando sirene out
-GPIO.setwarnings(False)
-#sensor de porta
-#GPIO.setup(GPIO_DOOR, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-#sensor de presenca
-#GPIO.setup(GPIO_MOTION, GPIO.IN)
-#GPIO.setup(GPIO_MOTION2, GPIO.IN)
-
-print ('Validando o checkstatus')
-#vericar status  do GPIO
-#checkStatus()
-
 try:
+    bot.sendMessage(cfg.chatCfg['idChat'],'SISTEMA INICIADO.')
+    achou_time = 0
+    minuto = 30
+    horas  = 99
+    ipSet  = '0'
+    portaFechada = 1
+
+    leConfigCamera()
+
+    Thread(target = enviaVideoMin, args = (cfg.chatCfg['idChat'], ipcam1,)).start()
+    Thread(target = enviaVideoMin, args = (cfg.chatCfg['idChat'], ipcam2,)).start()
+    #enviaFotoDirect(cfg.chatCfg['idChat'])
+
+    #ativando gpio
+    GPIO.setmode(GPIO.BCM)
+    #selecionando sirene out
+    GPIO.setwarnings(False)
+    #sensor de porta
+    #GPIO.setup(GPIO_DOOR, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    #sensor de presenca
+    #GPIO.setup(GPIO_MOTION, GPIO.IN)
+    #GPIO.setup(GPIO_MOTION2, GPIO.IN)
+
+    print ('Validando o checkstatus')
+    #vericar status  do GPIO
+    #checkStatus()
+
     print ('Iniciando GPIO')
 #    GPIO.add_event_detect(GPIO_DOOR, GPIO.BOTH, callback = sensorPorta)
 #    GPIO.add_event_detect(GPIO_MOTION,  GPIO.RISING, callback= sensorPresenca, bouncetime=200)
@@ -405,8 +404,8 @@ try:
               print('Hora fechada')
               horas  = now.hour
               achou_time = 0
-              enviaFotoDirect(cfg.chatCfg['idChat'])
-#          enviaVideoDirect(cfg.chatCfg['idChat'])
+#              enviaFotoDirect(cfg.chatCfg['idChat'])
+#              enviaVideoDirect(cfg.chatCfg['idChat'])
          if (now.minute > minuto) and achou_time == 0:
               print("enviado timelapse")
               achou_time = 1
@@ -415,5 +414,5 @@ try:
          time.sleep(60)
 
 except:
-    print("Unexpected error:", sys.exc_info()[0])
+    print("Erro no sistema!:", sys.exc_info()[0])
     GPIO.cleanup()
