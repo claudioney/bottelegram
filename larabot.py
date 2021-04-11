@@ -158,18 +158,13 @@ def enviaVideoDirect(chat_id):
     directVideo(chat_id)
 
 def directFoto(chat_id):
-    imagem = os.getcwd()+'/'+str(chat_id)+'/directPhoto.jpg';
+    imagem = os.getcwd()+'/'+str(chat_id)+'/directPhoto.jpg'
     if os.path.exists(imagem):
         os.remove(imagem)
     try:
       #sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipSet+':1981//Master-0 -frames:v 1 '+str(chat_id)+'/directPhoto.jpg', shell=True)
-      ffmpeg
-        .input(rtsp://192.168.2.'+ipSet+':1981//Master-0)
-        .filter('fps', fps='1/60')
-        .output(imagem, 
-                start_number=0)
-        .overwrite_output()
-        .run(quiet=True)
+      ffmpeg.input('rtsp://192.168.2.'+ipSet+':1981//Master-0').filter('fps', fps='1/60').output(imagem,start_number=0).overwrite_output().run(quiet=True)
+
       bot.sendPhoto(chat_id,('directPhoto.jpg',open(imagem, 'rb')),caption='Direct foto')
     except:
       bot.sendMessage(chat_id,'falha ao mandar a foto direta')
