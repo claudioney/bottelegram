@@ -163,7 +163,7 @@ def directFoto(chat_id):
         os.remove(imagem)
     try:
       #sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipSet+':1981//Master-0 -frames:v 1 '+str(chat_id)+'/directPhoto.jpg', shell=True)
-      ffmpeg.input('rtsp://192.168.2.'+ipSet+':1981//Master-0').filter('fps', fps='1/60').output(imagem,start_number=0).overwrite_output().run(quiet=True)
+      ffmpeg.input('rtsp://192.168.2.'+ipSet+':1981//Master-0').filter('fps', fps='1/60').output(imagem,vframes=1, format='image2', vcodec='mjpeg').overwrite_output().run(quiet=True)
 
       bot.sendPhoto(chat_id,('directPhoto.jpg',open(imagem, 'rb')),caption='Direct foto')
     except:
