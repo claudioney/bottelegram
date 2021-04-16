@@ -435,15 +435,3 @@ except telepot.apihelper.requests.exceptions.httperror:
 except:
     print("Erro no sistema!:", sys.exc_info()[0])
     GPIO.cleanup()
-except telepot.apihelper.requests.exceptions.connectionerror:
-    pass
-except telepot.apihelper.requests.Exceptions.connectTimeout:
-    pass
-except telepot.apihelper.Requests.Exceptions.ReadTimeout:
-    pass
-except telepot.apihelper.requests.Exceptions.reTryerror:
-    pass
-except telepot.apihelper.Requests.Exceptions.Timeout:
-    pass
-except telepot.apihelper.requests.exceptions.httperror:
-    pass
