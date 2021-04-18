@@ -292,7 +292,7 @@ def sensorPortaFechada():
     time.sleep(0.5)
 
 def handle(msg):
-    global ipSet, ipcam1, ipcam2, WARNING, WARN_GPIO, WARN_GPIO2
+    global ipSet, ipcam1, ipcam2, WARNING, WARN_GPIO, WARN_GPIO2, SEND_VIDEO_MIN
     chat_id = msg['chat']['id']
     command = msg['text']
 
