@@ -430,6 +430,20 @@ try:
               enviaTimelapseHour(h.hour,cfg.chatCfg['idChat'])
          time.sleep(60)
 
+except telepot.apihelper.requests.exceptions.connectionerror:
+    pass
+except telepot.apihelper.requests.Exceptions.connectTimeout:
+    pass
+except telepot.apihelper.Requests.Exceptions.ReadTimeout:
+    pass
+except telepot.apihelper.requests.Exceptions.reTryerror:
+    pass
+except telepot.apihelper.Requests.Exceptions.Timeout:
+    pass
+except telepot.apihelper.requests.exceptions.httperror:
+    pass
+except KeyError:
+    pass
 except:
     print("Erro no sistema!:", sys.exc_info()[0])
     GPIO.cleanup()
