@@ -123,7 +123,7 @@ def enviaVideoMin(chat_id, ipcam):
       now = datetime.datetime.now()
       hora = now.hour
       min = now.minute
-      arq = '/videoMin'+ipcam+'_'+hora+min'.mkv'
+      arq = '/videoMin'+ipcam+'_'+str(hora)+str(min)+'.mkv'
       imagem = os.getcwd()+'/'+str(chat_id)+arq
       print ('gerando arquivo '+imagem)
       if os.path.exists(imagem):
