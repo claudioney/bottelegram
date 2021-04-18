@@ -363,7 +363,7 @@ def handle(msg):
     elif command == '/video1':
         SEND_VIDEO_MIN = 1
         bot.sendMessage(chat_id, 'VIDEO MIN ON')
-    elif command == '/video1':
+    elif command == '/video0':
         SEND_VIDEO_MIN = 0
         bot.sendMessage(chat_id, 'VIDEO MIN OFF')
     elif command == 'PORTA':
