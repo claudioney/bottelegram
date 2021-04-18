@@ -18,18 +18,29 @@ import config as cfg
 import csv
 
 
-GPIO_DOOR = 22
-GPIO_MOTION = 24
-GPIO_MOTION2 = 23
-sirene = 25
 ipcam1 = 1
 ipcam2 = 1
 
 portaFechada = 1
 WARNING = 1
 ALARM = 0
+SEND_VIDEO_MIN = 0
 WARN_GPIO = 1
 WARN_GPIO2 = 1
+GPIO_DOOR = 22
+GPIO_MOTION = 24
+GPIO_MOTION2 = 23
+sirene = 25
+
+
+def leConfigCamera():
+    global ipcam1, ipcam2
+    print ('Lendo as configuraçoes da ip camera')
+    linhas = csv.reader(open('ipcam.csv'))
+    for row in linhas: 
+        if row[0] == 'varanda': ipcam1 = row[1]
+        if row[0] == 'sala': ipcam2 =  row[1]
+    return
 
 async def hello(websocket, path):
     name = await websocket.recv()
@@ -85,7 +96,7 @@ def listaIps(chat_id):
     list = sp.check_output('nmap -sP 192.168.2.1-255 | grep 192.168.2 |  awk \'{ print $5 }\' | sed -e \'s/192.168.2./IP /g\'',shell=True)
     opt = list.decode('utf-8').split('\n')
     bot.sendMessage(chat_id,'tem esse pessoal:',reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="/menu")],opt]))
-    return;
+    return
 
 def listaIpsMenu(chat_id):
     list = sp.check_output('nmap -sP 192.168.2.1-255 | grep 192.168.2',shell=True)
@@ -99,14 +110,6 @@ def botaIp(chat_id,msg):
     sp.check_call('echo "'+ipSet+'\n" >> /home/pi/camimage/camp_ip.ini', shell=True)
     return
 
-def enviaTimelapse(chat_id):
-    bot.sendMessage(chat_id,'estou indo fazer a paradinha...')
-    sp.check_call('ffmpeg -y -r 3 -pattern_type glob -i "/home/pi/telepot/laraBot/images/directPhoto*.jpg" -vcodec libx264 /home/pi/camimage/timelapse.mp4 && rm /home/pi/telepot/laraBot/images/directPhoto*.jpg', shell=True)
-    bot.sendMessage(chat_id,'enviando..')
-    bot.sendVideo(chat_id, open('/home/pi/camimage/timelapse.mp4', 'rb'))
-    time.sleep(0.5)
-    return
-
 def enviaArquivo(chat_id, arquivo):
     bot.sendMessage(chat_id,'enviando arquivo...')
     bot.sendVideo(chat_id, open('/home/pi/camimage/'+arquivo, 'rb'))
@@ -117,13 +120,18 @@ def enviaArquivo(chat_id, arquivo):
 def enviaVideoMin(chat_id, ipcam):
     while True:
       time.sleep(10)
-      imagem = os.getcwd()+'/'+str(chat_id)+'/videoMin'+ipcam+'.mkv'
+      now = datetime.datetime.now()
+      hora = now.hour
+      min = now.minute
+      arq = '/videoMin'+ipcam+'_'+hora+min'.mkv'
+      imagem = os.getcwd()+'/'+str(chat_id)+arq
       print ('gerando arquivo '+imagem)
       if os.path.exists(imagem):
         os.remove(imagem)
       try:
         sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t 300 -codec copy ' + imagem, shell=True)
-        bot.sendVideo(chat_id, open(imagem, 'rb'))
+        if SEND_VIDEO_MIN == 1:
+           bot.sendVideo(chat_id, open(imagem, 'rb'))
       except:
         bot.sendMessage(chat_id,'falha ao mandar video min' + imagem)
         time.sleep(5)
@@ -304,8 +312,6 @@ def handle(msg):
     elif command.startswith("Toma="):
         arq = msg['text'][5:]
         enviaArquivo(chat_id, arq)
-    elif command == 'Paradinha':
-        enviaTimelapse(chat_id)
     elif command.startswith("Cam1="):
         ipcam1 = msg['text'][5:]
         gravaConfigCamera()
@@ -354,10 +360,14 @@ def handle(msg):
     elif command == 'GPIOFF2':
         WARN_GPIO2 = 0
         bot.sendMessage(chat_id, 'GPIO 2 OFF')
+    elif command == '/video1':
+        SEND_VIDEO_MIN = 1
+        bot.sendMessage(chat_id, 'VIDEO MIN ON')
+    elif command == '/video1':
+        SEND_VIDEO_MIN = 0
+        bot.sendMessage(chat_id, 'VIDEO MIN OFF')
     elif command == 'PORTA':
         verPorta()
-
-
 
 bot = telepot.Bot(cfg.botTelepot['id'])
 
