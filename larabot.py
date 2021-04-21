@@ -202,17 +202,10 @@ def directVideo(chat_id):
     return
 
 def enviaFoto(chat_id):
+    bot.sendMessage(chat_id,'enviando a foto')
     imagem = os.getcwd()+'/'+str(chat_id)+'/screenshot.jpg'
-    if os.path.exists(imagem):
-        os.remove(imagem)
-    bot.sendMessage(chat_id,'estou indo tirar a foto')
-    try:
-      sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipSet+':1981//Master-0 -frames:v 1 '+str(chat_id)+'/screenshot.jpg', shell=True)
-      bot.sendMessage(chat_id,'estou mandando a foto')
-      bot.sendPhoto(chat_id,('screenshot.jpg',open(str(chat_id)+'/screenshot.jpg', 'rb')),caption='pronto! ta ae a foto!')
-    except:
-      bot.sendMessage(chat_id,'o trouxa chegou, nao posso mandar')
-    time.sleep(0.5)
+    botEnviaFoto(chat_id, ipcam1, imagem)
+    botEnviaFoto(chat_id, ipcam2, imagem)
     return
 
 def enviaVideo(chat_id):
