@@ -124,7 +124,7 @@ def botEnviaFoto(chat_id, ipcam, arquivo):
     try:
       #sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -frames:v 1 '+str(chat_id)+'/directPhoto.jpg', shell=True)
       ffmpeg.input('rtsp://192.168.2.'+ipcam+':1981//Master-0').filter('scale', size='hd1080', force_original_aspect_ratio='increase').output(arquivo,vframes=1, format='image2', vcodec='mjpeg').overwrite_output().run(quiet=True)
-      bot.sendPhoto(chat_id,(imagem,open(imagem, 'rb')),caption='Direct foto')
+      bot.sendPhoto(chat_id,(arquivo,open(arquivo, 'rb')),caption='Direct foto')
     except:
       bot.sendMessage(chat_id,'falha ao mandar foto: '+arquivo)
     time.sleep(0.5)
@@ -134,7 +134,7 @@ def botEnviaVideo(chat_id, ipcam, arquivo, timer):
     if os.path.exists(arquivo):
         os.remove(arquivo)
     try:
-      sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t '+timer+' -codec copy ' + arquivo, shell=True)
+      sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t '+str(timer)+' -codec copy ' + arquivo, shell=True)
       bot.sendVideo(chat_id, open(arquivo, 'rb'))
     except:
       bot.sendMessage(chat_id,'falha ao mandar video: '+arquivo)
