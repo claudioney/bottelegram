@@ -126,7 +126,7 @@ def botEnviaFoto(chat_id, ipcam, arquivo):
       ffmpeg.input('rtsp://192.168.2.'+ipcam+':1981//Master-0').filter('scale', size='hd1080', force_original_aspect_ratio='increase').output(arquivo,vframes=1, format='image2', vcodec='mjpeg').overwrite_output().run(quiet=True)
 
       if SEND_PHOTO_MIN == 1:
-        bot.sendPhoto(chat_id,('directPhoto.jpg',open(imagem, 'rb')),caption='Direct foto')
+        bot.sendPhoto(chat_id,(imagem,open(imagem, 'rb')),caption='Direct foto')
     except:
       bot.sendMessage(chat_id,'falha ao mandar foto: '+arquivo)
     time.sleep(0.5)
@@ -182,6 +182,13 @@ def systemReboot(chat_id):
     bot.sendMessage(chat_id,'sinto q vou desmaiar...')
     os.system('systemctl reboot -i')
     return
+
+def enviaFotoDirect(chat_id):
+    global ipSet
+    ipSet = ipcam1
+    directFoto(chat_id)
+    ipSet = ipcam2
+    directFoto(chat_id)
 
 def directVideo(chat_id):
     imagem = os.getcwd()+'/'+str(chat_id)+'/directVideo.mkv'
