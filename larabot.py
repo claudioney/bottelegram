@@ -25,6 +25,8 @@ portaFechada = 1
 WARNING = 1
 ALARM = 0
 SEND_VIDEO_MIN = 0
+SEND_PHOTO_MIN = 0
+TIMER_VIDEO_MIN = 300 # 5 minutos
 WARN_GPIO = 1
 WARN_GPIO2 = 1
 GPIO_DOOR = 22
@@ -116,26 +118,49 @@ def enviaArquivo(chat_id, arquivo):
     time.sleep(0.5)
     return
 
+def botEnviaFoto(chat_id, ipcam, arquivo):
+    if os.path.exists(arquivo):
+        os.remove(arquivo)
+    try:
+      #sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -frames:v 1 '+str(chat_id)+'/directPhoto.jpg', shell=True)
+      ffmpeg.input('rtsp://192.168.2.'+ipcam+':1981//Master-0').filter('scale', size='hd1080', force_original_aspect_ratio='increase').output(arquivo,vframes=1, format='image2', vcodec='mjpeg').overwrite_output().run(quiet=True)
+
+      if SEND_PHOTO_MIN == 1:
+        bot.sendPhoto(chat_id,('directPhoto.jpg',open(imagem, 'rb')),caption='Direct foto')
+    except:
+      bot.sendMessage(chat_id,'falha ao mandar foto: '+arquivo)
+    time.sleep(0.5)
+    return
+
+def botEnviaVideo(chat_id, ipcam, arquivo):
+    if os.path.exists(arquivo):
+        os.remove(arquivo)
+    try:
+      sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t 300 -codec copy ' + arquivo, shell=True)
+      if SEND_VIDEO_MIN == 1:
+        bot.sendVideo(chat_id, open(arquivo, 'rb'))
+    except:
+      bot.sendMessage(chat_id,'falha ao mandar video: '+arquivo)
+    time.sleep(0.5)
+    return
 
 def enviaVideoMin(chat_id, ipcam):
     while True:
       time.sleep(10)
-      now = datetime.datetime.now()
-      hora = now.hour
-      min = now.minute
+#      now = datetime.datetime.now()
+#      hora = now.hour
+#      min = now.minute
 #      arq = '/videoMin'+ipcam+'_'+str(hora)+str(min)+'.mkv'
-      arq = '/videoMin'+ipcam+'.mkv'
-      imagem = os.getcwd()+'/'+str(chat_id)+arq
-      print ('gerando arquivo '+imagem)
-      if os.path.exists(imagem):
-        os.remove(imagem)
-      try:
-        sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t 300 -codec copy ' + imagem, shell=True)
-        if SEND_VIDEO_MIN == 1:
-           bot.sendVideo(chat_id, open(imagem, 'rb'))
-      except:
-        bot.sendMessage(chat_id,'falha ao mandar video min' + imagem)
-        time.sleep(5)
+      arq = '/screen_'+ipcam
+      arqVideo = os.getcwd()+'/'+str(chat_id)+arq +'.mkv'
+      arqFoto = os.getcwd()+'/'+str(chat_id)+arq +'.jpg'
+
+      print ('gerando arquivo '+arqFoto)
+      botEnviaFoto(chat_id, ipcam, arqFoto)
+
+      print ('gerando arquivo '+arqVideo)
+      botEnviaVideo(chat_id, ipcam, arqVideo)
+
     return
 
 
@@ -152,34 +177,6 @@ def enviaTimelapseHour(hora, chat_id):
         bot.sendMessage(chat_id,'falha ao mandar timelapse')
 
     time.sleep(0.5)
-
-def enviaFotoDirect(chat_id):
-    global ipcam1, ipcam2, ipSet
-    ipSet = ipcam1
-    directFoto(chat_id)
-    ipSet = ipcam2
-    directFoto(chat_id)
-
-def enviaVideoDirect(chat_id):
-    global ipcam1, ipcam2, ipSet
-    ipSet = ipcam1
-    directVideo(chat_id)
-    ipSet = ipcam2
-    directVideo(chat_id)
-
-def directFoto(chat_id):
-    imagem = os.getcwd()+'/'+str(chat_id)+'/directPhoto.jpg'
-    if os.path.exists(imagem):
-        os.remove(imagem)
-    try:
-      #sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipSet+':1981//Master-0 -frames:v 1 '+str(chat_id)+'/directPhoto.jpg', shell=True)
-      ffmpeg.input('rtsp://192.168.2.'+ipSet+':1981//Master-0').filter('scale', size='hd1080', force_original_aspect_ratio='increase').output(imagem,vframes=1, format='image2', vcodec='mjpeg').overwrite_output().run(quiet=True)
-
-      bot.sendPhoto(chat_id,('directPhoto.jpg',open(imagem, 'rb')),caption='Direct foto')
-    except:
-      bot.sendMessage(chat_id,'falha ao mandar a foto direta')
-    time.sleep(0.5)
-    return
 
 def systemReboot(chat_id):
     bot.sendMessage(chat_id,'sinto q vou desmaiar...')
@@ -293,7 +290,7 @@ def sensorPortaFechada():
     time.sleep(0.5)
 
 def handle(msg):
-    global ipSet, ipcam1, ipcam2, WARNING, WARN_GPIO, WARN_GPIO2, SEND_VIDEO_MIN
+    global ipSet, ipcam1, ipcam2, WARNING, WARN_GPIO, WARN_GPIO2, SEND_VIDEO_MIN, SEND_PHOTO_MIN
     chat_id = msg['chat']['id']
     command = msg['text']
 
@@ -304,6 +301,28 @@ def handle(msg):
     elif command == '/start':
         bot.sendMessage(chat_id,'Bem vindo!')
         sp.check_call('mkdir '+str(chat_id), shell=True)
+    elif command == '/video1':
+        SEND_VIDEO_MIN = 1
+        bot.sendMessage(chat_id, 'VIDEO MIN ON')
+    elif command == '/video0':
+        SEND_VIDEO_MIN = 0
+        bot.sendMessage(chat_id, 'VIDEO MIN OFF')
+    elif command == '/foto1':
+        SEND_PHOTO_MIN = 1
+        bot.sendMessage(chat_id, 'VIDEO FOTO ON')
+    elif command == '/foto0':
+        SEND_PHOTO_MIN = 0
+        bot.sendMessage(chat_id, 'VIDEO FOTO OFF')
+    elif command == '/menu':
+        bot.sendMessage(chat_id,'Selecione',reply_markup=ReplyKeyboardMarkup(
+                                keyboard=[
+                                    [KeyboardButton(text="Manda nude")],
+                                    [KeyboardButton(text="Corta pra 18")],
+                                    [KeyboardButton(text='Ta sozinha?')],
+                                    ['/video1', '/video0', 'Disco', '/foto1','/foto0']
+                                ]
+                            ))
+
     elif command.startswith("Ta so"):
         listaIps(chat_id)
     elif command =='Manda nude':
@@ -327,15 +346,6 @@ def handle(msg):
         ipSet = msg['text'][3:]
         print ('ip mudado para '+ipSet)
         bot.sendMessage(chat_id,'IP='+ipSet)
-    elif command == '/menu':
-        bot.sendMessage(chat_id,'Selecione',reply_markup=ReplyKeyboardMarkup(
-                                keyboard=[
-                                    [KeyboardButton(text="Manda nude")],
-                                    [KeyboardButton(text="Corta pra 18")],
-                                    [KeyboardButton(text='Ta sozinha?')],
-                                    ['WON', 'WOFF', 'Disco', 'PORTA']
-                                ]
-                            ))
     elif command == 'Toca o terror':
         bot.sendMessage(chat_id,'Tocando o alarme por 60 segundos')
         tocaAlarme()
@@ -361,12 +371,6 @@ def handle(msg):
     elif command == 'GPIOFF2':
         WARN_GPIO2 = 0
         bot.sendMessage(chat_id, 'GPIO 2 OFF')
-    elif command == '/video1':
-        SEND_VIDEO_MIN = 1
-        bot.sendMessage(chat_id, 'VIDEO MIN ON')
-    elif command == '/video0':
-        SEND_VIDEO_MIN = 0
-        bot.sendMessage(chat_id, 'VIDEO MIN OFF')
     elif command == 'PORTA':
         verPorta()
 
