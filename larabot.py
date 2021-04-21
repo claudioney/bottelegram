@@ -184,9 +184,9 @@ def systemReboot(chat_id):
 
 def enviaFotoDirect(chat_id):
     arquivo = os.getcwd()+'/'+str(chat_id)+'/directPhoto_'+ipcam1 +'.jpg'
-    botEnviaFoto(chat_id, ipcam1, arquivo):
+    botEnviaFoto(chat_id, ipcam1, arquivo)
     arquivo = os.getcwd()+'/'+str(chat_id)+'/directPhoto_'+ipcam2 +'.jpg'
-    botEnviaFoto(chat_id, ipcam2, arquivo):
+    botEnviaFoto(chat_id, ipcam2, arquivo)
     return
 
 def directVideo(chat_id):
