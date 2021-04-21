@@ -124,21 +124,18 @@ def botEnviaFoto(chat_id, ipcam, arquivo):
     try:
       #sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -frames:v 1 '+str(chat_id)+'/directPhoto.jpg', shell=True)
       ffmpeg.input('rtsp://192.168.2.'+ipcam+':1981//Master-0').filter('scale', size='hd1080', force_original_aspect_ratio='increase').output(arquivo,vframes=1, format='image2', vcodec='mjpeg').overwrite_output().run(quiet=True)
-
-      if SEND_PHOTO_MIN == 1:
-        bot.sendPhoto(chat_id,(imagem,open(imagem, 'rb')),caption='Direct foto')
+      bot.sendPhoto(chat_id,(imagem,open(imagem, 'rb')),caption='Direct foto')
     except:
       bot.sendMessage(chat_id,'falha ao mandar foto: '+arquivo)
     time.sleep(0.5)
     return
 
-def botEnviaVideo(chat_id, ipcam, arquivo):
+def botEnviaVideo(chat_id, ipcam, arquivo, timer):
     if os.path.exists(arquivo):
         os.remove(arquivo)
     try:
-      sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t 300 -codec copy ' + arquivo, shell=True)
-      if SEND_VIDEO_MIN == 1:
-        bot.sendVideo(chat_id, open(arquivo, 'rb'))
+      sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t '+timer+' -codec copy ' + arquivo, shell=True)
+      bot.sendVideo(chat_id, open(arquivo, 'rb'))
     except:
       bot.sendMessage(chat_id,'falha ao mandar video: '+arquivo)
     time.sleep(0.5)
@@ -155,11 +152,13 @@ def enviaVideoMin(chat_id, ipcam):
       arqVideo = os.getcwd()+'/'+str(chat_id)+arq +'.mkv'
       arqFoto = os.getcwd()+'/'+str(chat_id)+arq +'.jpg'
 
-      print ('gerando arquivo '+arqFoto)
-      botEnviaFoto(chat_id, ipcam, arqFoto)
+      if SEND_PHOTO_MIN == 1:
+        print ('gerando arquivo '+arqFoto)
+        botEnviaFoto(chat_id, ipcam, arqFoto)
 
-      print ('gerando arquivo '+arqVideo)
-      botEnviaVideo(chat_id, ipcam, arqVideo)
+      if SEND_VIDEO_MIN == 1:
+        print ('gerando arquivo '+arqVideo)
+        botEnviaVideo(chat_id, ipcam, arqVideo, 300)
 
     return
 
@@ -184,11 +183,11 @@ def systemReboot(chat_id):
     return
 
 def enviaFotoDirect(chat_id):
-    global ipSet
-    ipSet = ipcam1
-    directFoto(chat_id)
-    ipSet = ipcam2
-    directFoto(chat_id)
+    arquivo = os.getcwd()+'/'+str(chat_id)+'/directPhoto_'+ipcam1 +'.jpg'
+    botEnviaFoto(chat_id, ipcam1, arquivo):
+    arquivo = os.getcwd()+'/'+str(chat_id)+'/directPhoto_'+ipcam2 +'.jpg'
+    botEnviaFoto(chat_id, ipcam2, arquivo):
+    return
 
 def directVideo(chat_id):
     imagem = os.getcwd()+'/'+str(chat_id)+'/directVideo.mkv'
