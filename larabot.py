@@ -95,13 +95,13 @@ def espacoDisco(chat_id):
 
 def listaIps(chat_id):
     bot.sendMessage(chat_id,'Deixa eu ver...')
-    list = sp.check_output('nmap -sP 192.168.2.1-255 | grep 192.168.2 |  awk \'{ print $5 }\' | sed -e \'s/192.168.2./IP /g\'',shell=True)
+    list = sp.check_output('nmap -sP 10.0.0.1-255 | grep 10.0.0 |  awk \'{ print $5 }\' | sed -e \'s/10.0.0./IP /g\'',shell=True)
     opt = list.decode('utf-8').split('\n')
     bot.sendMessage(chat_id,'tem esse pessoal:',reply_markup=ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="/menu")],opt]))
     return
 
 def listaIpsMenu(chat_id):
-    list = sp.check_output('nmap -sP 192.168.2.1-255 | grep 192.168.2',shell=True)
+    list = sp.check_output('nmap -sP 10.0.0.1-255 | grep 10.0.0',shell=True)
     bot.sendMessage(chat_id,'Tem esse pessoal aqui',list.decode('utf-8').split('\n'))
     return
 
@@ -123,7 +123,7 @@ def botEnviaFoto(chat_id, ipcam, arquivo):
         os.remove(arquivo)
     try:
       #sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -frames:v 1 '+str(chat_id)+'/directPhoto.jpg', shell=True)
-      ffmpeg.input('rtsp://192.168.2.'+ipcam+':1981//Master-0').filter('scale', size='hd1080', force_original_aspect_ratio='increase').output(arquivo,vframes=1, format='image2', vcodec='mjpeg').overwrite_output().run(quiet=True)
+      ffmpeg.input('rtsp://10.0.0.'+ipcam+':1981//Master-0').filter('scale', size='hd1080', force_original_aspect_ratio='increase').output(arquivo,vframes=1, format='image2', vcodec='mjpeg').overwrite_output().run(quiet=True)
       bot.sendPhoto(chat_id,(arquivo,open(arquivo, 'rb')),caption='Direct foto')
     except:
       bot.sendMessage(chat_id,'falha ao mandar foto: '+arquivo)
@@ -134,7 +134,7 @@ def botEnviaVideo(chat_id, ipcam, arquivo, timer):
     if os.path.exists(arquivo):
         os.remove(arquivo)
     try:
-      sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipcam+':1981//Master-0 -t '+str(timer)+' -codec copy ' + arquivo, shell=True)
+      sp.check_call('ffmpeg -i rtsp://10.0.0.'+ipcam+':1981//Master-0 -t '+str(timer)+' -codec copy ' + arquivo, shell=True)
       bot.sendVideo(chat_id, open(arquivo, 'rb'))
     except:
       bot.sendMessage(chat_id,'falha ao mandar video: '+arquivo)
@@ -194,7 +194,7 @@ def directVideo(chat_id):
     if os.path.exists(imagem):
         os.remove(imagem)
     try:
-       sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipSet+':1981//Master-0 -t 30 -codec copy '+str(chat_id)+'/directVideo.mkv', shell=True)
+       sp.check_call('ffmpeg -i rtsp://10.0.0.'+ipSet+':1981//Master-0 -t 30 -codec copy '+str(chat_id)+'/directVideo.mkv', shell=True)
        bot.sendVideo(chat_id, open(str(chat_id)+'/directVideo.mkv', 'rb'))
     except:
       bot.sendMessage(chat_id,'falha ao mandar a video direta')
@@ -215,7 +215,7 @@ def enviaVideo(chat_id):
         os.remove(imagem)
     bot.sendMessage(chat_id,'fazendo um video de 30 segundos')
     try:
-       sp.check_call('ffmpeg -i rtsp://192.168.2.'+ipSet+':1981//Master-0 -t 30 -codec copy '+str(chat_id)+'/capture.mkv', shell=True)
+       sp.check_call('ffmpeg -i rtsp://10.0.0.'+ipSet+':1981//Master-0 -t 30 -codec copy '+str(chat_id)+'/capture.mkv', shell=True)
        bot.sendMessage(chat_id,'mandando o video')
        bot.sendVideo(chat_id, open(str(chat_id)+'/capture.mkv', 'rb'))
     except:
@@ -381,7 +381,7 @@ print ('Iniciando o sistema')
 try:
     bot.sendMessage(cfg.chatCfg['idChat'],'SISTEMA INICIADO.')
     achou_time = 0
-    minuto = 30
+    minuto = 50
     horas  = 99
     ipSet  = '0'
     portaFechada = 1
